@@ -1,5 +1,8 @@
+/* eslint-disable react/prop-types */
+import axios from "axios";
 import { useState } from "react";
 import { escape, isLength, matches } from "validator";
+import { SERVER_URL } from "../util/constants";
 
 const USERNAME_ERRORS = [
   "",
@@ -12,16 +15,36 @@ const PASSWORD_ERRORS = [
   "Password should be minimum 8 and maximum 20 letters long.",
 ];
 
-function SignIn() {
+function SignIn(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState(USERNAME_ERRORS[0]);
   const [passwordError, setPasswordError] = useState(PASSWORD_ERRORS[0]);
+  const [message, setMessage] = useState(props.message);
 
   function handleSubmit(event) {
     event.preventDefault();
     if (usernameError === passwordError && usernameError === "") {
-      //
+      axios
+        .post(SERVER_URL + "/auth/signin", {
+          username: username,
+          password: password,
+        })
+        .then((res) => {
+          console.log(res.data);
+          localStorage.setItem("token", res.data.token);
+          console.log(localStorage.getItem("token"));
+          props.renderPage(0, "Welcome" + username);
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.response.status === 403) {
+            setMessage("Wrong Password.");
+            setPassword("");
+          }
+          if (err.response.status === 404)
+            props.renderPage(2, "User not found, please register.");
+        });
     }
   }
 
@@ -45,6 +68,7 @@ function SignIn() {
 
   return (
     <div>
+      <div>{message}</div>
       <form action="" method="post" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="username">Username</label>
@@ -74,7 +98,7 @@ function SignIn() {
           <button type="submit">Sign In</button>
         </div>
       </form>
-      <div>Register</div>
+      <div onClick={() => props.renderPage(2, "")}>Register</div>
     </div>
   );
 }

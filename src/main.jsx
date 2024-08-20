@@ -8,6 +8,6 @@ import ChatWindow from "./components/ChatWindow.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <SignIn />
+    <App />
   </StrictMode>,
 );

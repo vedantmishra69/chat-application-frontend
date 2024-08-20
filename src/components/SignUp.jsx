@@ -1,5 +1,8 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { escape, isLength, matches } from "validator";
+import axios from "axios";
+import { SERVER_URL } from "../util/constants";
 
 const USERNAME_ERRORS = [
   "",
@@ -13,7 +16,7 @@ const PASSWORD_ERRORS = [
   "Passwords do not match.",
 ];
 
-function SignUp() {
+function SignUp(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,11 +25,31 @@ function SignUp() {
   const [confirmPasswordError, setConfirmPasswordError] = useState(
     PASSWORD_ERRORS[0],
   );
+  const [message, setMessage] = useState(props.message);
 
   function handleSubmit(event) {
     event.preventDefault();
-    if (usernameError === passwordError && usernameError === "") {
-      //
+    if (
+      usernameError === passwordError &&
+      passwordError == confirmPasswordError &&
+      usernameError === ""
+    ) {
+      axios
+        .post(SERVER_URL + "/auth/signup", {
+          username: username,
+          password: password,
+        })
+        .then((res) => {
+          console.log(res.data.message);
+          props.renderPage(1, "User registered, now please sign in.");
+        })
+        .catch((err) => {
+          console.log(err);
+          setMessage("Couldn't register, please try again.");
+        });
+      setUsername("");
+      setPassword("");
+      setConfirmPassword("");
     }
   }
 
@@ -60,7 +83,8 @@ function SignUp() {
 
   return (
     <div>
-      <form action="" method="post" onSubmit={handleSubmit}>
+      <div>{message}</div>
+      <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="username">Username</label>
         </div>
@@ -98,9 +122,16 @@ function SignUp() {
         </div>
         <div>{confirmPasswordError}</div>
         <div>
-          <button type="submit">Sign In</button>
+          <button type="submit">Sign Up</button>
         </div>
       </form>
+      <div
+        onClick={() => {
+          props.renderPage(1, "");
+        }}
+      >
+        Already have an account?
+      </div>
     </div>
   );
 }
