@@ -45,17 +45,17 @@ function SignUp(props) {
         })
         .catch((err) => {
           console.log(err);
-          setMessage("Couldn't register, please try again.");
+          if (err.response.status === 409)
+            setMessage("Username already taken, please try a different one.");
+          else setMessage("Couldn't register, please try again.");
         });
-      setUsername("");
-      setPassword("");
-      setConfirmPassword("");
     }
   }
 
   function handleUsernameInput(event) {
-    setUsername(event.target.value);
-    const escaped = escape(username);
+    const currentText = event.target.value;
+    setUsername(currentText);
+    const escaped = escape(currentText);
     if (!matches(escaped, /^[a-zA-Z0-9_]+$/)) {
       setUsernameError(USERNAME_ERRORS[1]);
     } else if (!isLength(escaped, { min: 1, max: 16 })) {
@@ -64,16 +64,18 @@ function SignUp(props) {
   }
 
   function handlePasswordInput(event) {
-    setPassword(event.target.value);
-    const escaped = escape(event.target.value);
+    const currentText = event.target.value;
+    setPassword(currentText);
+    const escaped = escape(currentText);
     if (!isLength(escaped, { min: 8, max: 20 })) {
       setPasswordError(PASSWORD_ERRORS[1]);
     } else setPasswordError(PASSWORD_ERRORS[0]);
   }
 
   function handleConfirmPasswordInput(event) {
-    setConfirmPassword(event.target.value);
-    const escaped = escape(event.target.value);
+    const currentText = event.target.value;
+    setConfirmPassword(currentText);
+    const escaped = escape(currentText);
     if (!isLength(escaped, { min: 8, max: 20 })) {
       setConfirmPasswordError(PASSWORD_ERRORS[1]);
     } else if (escaped !== password) {

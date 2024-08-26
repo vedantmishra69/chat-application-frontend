@@ -34,7 +34,7 @@ function SignIn(props) {
           console.log(res.data);
           localStorage.setItem("token", res.data.token);
           console.log(localStorage.getItem("token"));
-          props.renderPage(0, "Welcome" + username);
+          props.renderPage(0, "Welcome " + username, username);
         })
         .catch((err) => {
           console.log(err);

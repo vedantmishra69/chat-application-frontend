@@ -7,6 +7,7 @@ import SignUp from "./components/SignUp";
 import ChatWindow from "./components/ChatWindow";
 import axios from "axios";
 import { SERVER_URL } from "./util/constants";
+import UserList from "./components/UserList";
 
 // const clientId = nanoid();
 
@@ -15,34 +16,16 @@ import { SERVER_URL } from "./util/constants";
 function App() {
   const [renderPage, setRenderPage] = useState(0);
   const [homePageMessage, setHomePageMessage] = useState("loading");
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setRenderPage(1);
-      setHomePageMessage("");
-    } else {
-      axios
-        .post(SERVER_URL + "/auth/verify", {
-          token: token,
-        })
-        .then((res) => {
-          console.log(res.data.message);
-          setRenderPage(0);
-          setHomePageMessage(res.data.message);
-        })
-        .catch((err) => {
-          console.log(err.response.data.error);
-          setRenderPage(1);
-          setHomePageMessage("");
-        });
-    }
-  }, []);
   const handleRenderPage = (page, message) => {
     setRenderPage(page);
     setHomePageMessage(message);
   };
-  if (renderPage == 0) return <div>{homePageMessage}</div>;
+  if (renderPage == 0)
+    return (
+      <div>
+        <UserList renderPage={handleRenderPage} />
+      </div>
+    );
   else if (renderPage == 1)
     return <SignIn renderPage={handleRenderPage} message={homePageMessage} />;
   else if (renderPage == 2)

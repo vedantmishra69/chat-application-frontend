@@ -5,6 +5,7 @@ import "./index.css";
 import SignIn from "./components/SignIn.jsx";
 import SignUp from "./components/SignUp.jsx";
 import ChatWindow from "./components/ChatWindow.jsx";
+import UserList from "./components/UserList.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
