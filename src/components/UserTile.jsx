@@ -2,34 +2,33 @@
 import { useEffect, useState } from "react";
 import socket from "../util/socket";
 
-function UserTile(props) {
+function UserTile({ user }) {
   const [status, setStatus] = useState("offline");
-  const handleOnClick = () => {};
   useEffect(() => {
     console.log("Socket is connected:" + socket.connected);
     socket.onAny((event, ...args) => {
       console.log(event);
       console.log(args);
     });
-    socket.emit("isOnline", props.username, (isOnline) => {
+    socket.emit("isOnline", user, (isOnline) => {
       if (isOnline) setStatus("online");
     });
     socket.on("set offline", (username) => {
-      if (username == props.username) setStatus("offline");
+      if (username == user) setStatus("offline");
     });
     socket.on("set online", (username) => {
       console.log("recieved: " + username);
-      if (username == props.username) setStatus("online");
+      if (username == user) setStatus("online");
     });
     return () => {
       socket.off("set offline");
       socket.off("set online");
     };
-  }, [props]);
+  }, [user]);
   return (
-    <div className="border m-1 p-1" onClick={handleOnClick}>
+    <div className="border m-1 p-1">
       <div>
-        <span>{props.username}</span>
+        <span>{user}</span>
       </div>
       <div>
         <span>{status}</span>

@@ -15,12 +15,12 @@ const PASSWORD_ERRORS = [
   "Password should be minimum 8 and maximum 20 letters long.",
 ];
 
-function SignIn(props) {
+function SignIn({ topMessage, setProcess, setTopMessage, setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState(USERNAME_ERRORS[0]);
   const [passwordError, setPasswordError] = useState(PASSWORD_ERRORS[0]);
-  const [message, setMessage] = useState(props.message);
+  const [message, setMessage] = useState(topMessage);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -34,7 +34,8 @@ function SignIn(props) {
           console.log(res.data);
           localStorage.setItem("token", res.data.token);
           console.log(localStorage.getItem("token"));
-          props.renderPage(0, "Welcome " + username, username);
+          setUser(username);
+          setProcess("user verified");
         })
         .catch((err) => {
           console.log(err);
@@ -42,8 +43,10 @@ function SignIn(props) {
             setMessage("Wrong Password.");
             setPassword("");
           }
-          if (err.response.status === 404)
-            props.renderPage(2, "User not found, please register.");
+          if (err.response.status === 404) {
+            setTopMessage("User not found, please register.");
+            setProcess("sign up");
+          }
         });
     }
   }
@@ -98,7 +101,14 @@ function SignIn(props) {
           <button type="submit">Sign In</button>
         </div>
       </form>
-      <div onClick={() => props.renderPage(2, "")}>Register</div>
+      <div
+        onClick={() => {
+          setTopMessage("");
+          setProcess("sign up");
+        }}
+      >
+        Register
+      </div>
     </div>
   );
 }

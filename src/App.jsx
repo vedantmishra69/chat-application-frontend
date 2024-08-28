@@ -1,37 +1,71 @@
 import "./App.css";
-import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
-import { nanoid } from "nanoid";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
-import ChatWindow from "./components/ChatWindow";
 import axios from "axios";
 import { SERVER_URL } from "./util/constants";
-import UserList from "./components/UserList";
-// import { io } from "socket.io-client";
-
-// const clientId = nanoid();
-
-// const socket = io("http://localhost:5000");
+import LoadingPage from "./components/LoadingPage";
+import MainPage from "./components/MainPage";
 
 function App() {
-  const [renderPage, setRenderPage] = useState(0);
-  const [homePageMessage, setHomePageMessage] = useState("loading");
-  const handleRenderPage = (page, message) => {
-    setRenderPage(page);
-    setHomePageMessage(message);
+  const [username, setUsername] = useState("");
+  const [process, setProcess] = useState("token verify");
+  const [message, setMessage] = useState("");
+  const verifyToken = (token) => {
+    axios
+      .get(SERVER_URL + "/auth/verify", {
+        headers: {
+          Authorization: token,
+        },
+      })
+      .then((res) => {
+        console.log(res.data.username);
+        setUsername(res.data.username);
+        setProcess("user verified");
+      })
+      .catch((err) => {
+        console.log(err);
+        setProcess("sign in");
+      });
   };
-  if (renderPage == 0)
-    return (
-      <div>
-        <UserList renderPage={handleRenderPage} />
-      </div>
-    );
-  else if (renderPage == 1)
-    return <SignIn renderPage={handleRenderPage} message={homePageMessage} />;
-  else if (renderPage == 2)
-    return <SignUp renderPage={handleRenderPage} message={homePageMessage} />;
-  else return <div>{homePageMessage}</div>;
+  useEffect(() => {
+    if (process === "token verify") {
+      const token = localStorage.getItem("token");
+      console.log(token);
+      if (token) {
+        verifyToken(token);
+      } else setProcess("sign in");
+    }
+  }, [username, process]);
+  switch (process) {
+    case "token verify":
+      return <LoadingPage />;
+    case "user verified":
+      return (
+        <MainPage
+          username={username}
+          setProcess={setProcess}
+          setTopMessage={setMessage}
+        />
+      );
+    case "sign in":
+      return (
+        <SignIn
+          topMessage={message}
+          setProcess={setProcess}
+          setUser={setUsername}
+          setTopMessage={setMessage}
+        />
+      );
+    case "sign up":
+      return (
+        <SignUp
+          topMessage={message}
+          setProcess={setProcess}
+          setTopMessage={setMessage}
+        />
+      );
+  }
 }
 
 export default App;

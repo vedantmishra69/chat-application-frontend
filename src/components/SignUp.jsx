@@ -16,7 +16,7 @@ const PASSWORD_ERRORS = [
   "Passwords do not match.",
 ];
 
-function SignUp(props) {
+function SignUp({ topMessage, setTopMessage, setProcess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,7 +25,7 @@ function SignUp(props) {
   const [confirmPasswordError, setConfirmPasswordError] = useState(
     PASSWORD_ERRORS[0],
   );
-  const [message, setMessage] = useState(props.message);
+  const [message, setMessage] = useState(topMessage);
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -41,7 +41,8 @@ function SignUp(props) {
         })
         .then((res) => {
           console.log(res.data.message);
-          props.renderPage(1, "User registered, now please sign in.");
+          setTopMessage("User registered, now please sign in.");
+          setProcess("sign in");
         })
         .catch((err) => {
           console.log(err);
@@ -129,7 +130,8 @@ function SignUp(props) {
       </form>
       <div
         onClick={() => {
-          props.renderPage(1, "");
+          setTopMessage("");
+          setProcess("sign in");
         }}
       >
         Already have an account?
