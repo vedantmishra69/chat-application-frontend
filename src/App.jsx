@@ -8,6 +8,7 @@ import ChatWindow from "./components/ChatWindow";
 import axios from "axios";
 import { SERVER_URL } from "./util/constants";
 import UserList from "./components/UserList";
+// import { io } from "socket.io-client";
 
 // const clientId = nanoid();
 

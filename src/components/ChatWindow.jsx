@@ -3,6 +3,7 @@ import Message from "./Message";
 function ChatWindow() {
   return (
     <div>
+      <div>User</div>
       <div className="m-1">
         <Message />
         <Message />
