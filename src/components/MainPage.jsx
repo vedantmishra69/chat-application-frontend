@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import ChatWindow from "./ChatWindow";
 import UserList from "./UserList";
 import { io } from "socket.io-client";
+import ChatWindow from "./ChatWindow";
 
 function MainPage({ username, setTopMessage, setProcess }) {
+  const [page, setPage] = useState("user list");
   const [recepient, setRecepient] = useState("");
   const socket = io("http://localhost:3000", {
     auth: { token: localStorage.getItem("token") },
@@ -17,11 +18,12 @@ function MainPage({ username, setTopMessage, setProcess }) {
   };
   const handleChatWindow = (recepient) => {
     setRecepient(recepient);
+    setPage("chat window");
   };
-  return (
-    <div>
-      <p>{"Welcome " + username}</p>
-      <div className="flex flex-row">
+  if (page === "user list") {
+    return (
+      <div>
+        <p>{"Welcome " + username}</p>
         <div>
           <UserList
             username={username}
@@ -30,18 +32,17 @@ function MainPage({ username, setTopMessage, setProcess }) {
           />
         </div>
         <div>
-          <ChatWindow
-            username={username}
-            recepient={recepient}
-            socket={socket}
-          />
+          <button onClick={handleSignOut}>Sign Out</button>
         </div>
       </div>
+    );
+  } else {
+    return (
       <div>
-        <button onClick={handleSignOut}>Sign Out</button>
+        <ChatWindow socket={socket} recepient={recepient} setPage={setPage} />
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default MainPage;

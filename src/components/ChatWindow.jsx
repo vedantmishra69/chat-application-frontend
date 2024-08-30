@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Message from "./Message";
 import { nanoid } from "nanoid";
 
-function ChatWindow({ socket, recepient }) {
+function ChatWindow({ socket, recepient, setPage }) {
   const [messageList, setMessageList] = useState([]);
   const [message, setMessage] = useState("");
   const messageBoxList = messageList?.map((obj) => (
@@ -23,6 +23,9 @@ function ChatWindow({ socket, recepient }) {
   }, [messageList, recepient, socket]);
   return (
     <div>
+      <div>
+        <button onClick={() => setPage("user list")}>Back</button>
+      </div>
       <div>{recepient}</div>
       <div className="m-1">{messageBoxList}</div>
       <div className="m-1">
