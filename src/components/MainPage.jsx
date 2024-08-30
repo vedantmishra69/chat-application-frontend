@@ -1,34 +1,40 @@
 /* eslint-disable react/prop-types */
-import { useEffect } from "react";
+import { useState } from "react";
 import ChatWindow from "./ChatWindow";
 import UserList from "./UserList";
-import socket from "../util/socket";
+import { io } from "socket.io-client";
 
 function MainPage({ username, setTopMessage, setProcess }) {
+  const [recepient, setRecepient] = useState("");
+  const socket = io("http://localhost:3000", {
+    auth: { token: localStorage.getItem("token") },
+  });
   const handleSignOut = () => {
     localStorage.removeItem("token");
     if (socket.connected) socket.disconnect();
     setTopMessage("");
     setProcess("sign in");
   };
-  useEffect(() => {
-    socket.connect();
-    socket.on("connect", () => {
-      socket.emit("im on");
-    });
-    socket.on("connect_error", () => {
-      if (!socket.active) socket.connect();
-    });
-  }, []);
+  const handleChatWindow = (recepient) => {
+    setRecepient(recepient);
+  };
   return (
     <div>
       <p>{"Welcome " + username}</p>
       <div className="flex flex-row">
         <div>
-          <UserList username={username} />
+          <UserList
+            username={username}
+            socket={socket}
+            handleChatWindow={handleChatWindow}
+          />
         </div>
         <div>
-          <ChatWindow />
+          <ChatWindow
+            username={username}
+            recepient={recepient}
+            socket={socket}
+          />
         </div>
       </div>
       <div>

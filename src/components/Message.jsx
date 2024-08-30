@@ -1,11 +1,11 @@
-function Message() {
+/* eslint-disable react/prop-types */
+function Message({ user, message }) {
   return (
-    <div className="border rounded-md m-1">
+    <div
+      className={"border-2 " + (user ? " border-blue-400" : " border-red-400")}
+    >
       <div className="m-1">
-        <span>Username</span>
-      </div>
-      <div className="m-1">
-        <p>message content is here</p>
+        <p>{message}</p>
       </div>
     </div>
   );
