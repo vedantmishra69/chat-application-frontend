@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 function UserTile({ user, socket }) {
   const [status, setStatus] = useState("offline");
   useEffect(() => {
-    console.log("Socket is connected:" + socket.connected);
     socket.emit("isOnline", user, (isOnline) => {
       if (isOnline) setStatus("online");
     });

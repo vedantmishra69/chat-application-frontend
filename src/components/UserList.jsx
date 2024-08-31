@@ -5,7 +5,7 @@ import axios from "axios";
 import { SERVER_URL } from "../util/constants";
 import { nanoid } from "nanoid";
 
-function UserList({ username, socket, handleChatWindow }) {
+function UserList({ username, socket, handleChatWindow, handleSignOut }) {
   const [userList, setUserList] = useState([]);
   const [statusList, setStatusList] = useState({});
   const [renderList, setRenderList] = useState(false);
@@ -44,10 +44,12 @@ function UserList({ username, socket, handleChatWindow }) {
         })
         .catch((err) => {
           console.log(err);
+          if (err.response.status === 401) handleSignOut();
           setListError(err.response.data.error);
         });
     } else {
       socket.on("set online", (onlineUser, cb) => {
+        console.log(onlineUser + " is set online");
         const list = {};
         for (const user of userList) {
           if (user === onlineUser) list[user] = "online";
@@ -57,6 +59,7 @@ function UserList({ username, socket, handleChatWindow }) {
         cb(username);
       });
       socket.on("set offline", (offlineUser, cb) => {
+        console.log(offlineUser + " is set offline");
         const list = {};
         for (const user of userList) {
           if (user === offlineUser) list[user] = "offline";
@@ -66,7 +69,7 @@ function UserList({ username, socket, handleChatWindow }) {
         cb(username);
       });
     }
-  }, [renderList, socket, username, userList, statusList]);
+  }, [renderList, socket, username, userList, statusList, handleSignOut]);
   return (
     <div className="">
       <div>{listError}</div>

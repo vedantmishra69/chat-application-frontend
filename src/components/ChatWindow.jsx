@@ -1,45 +1,59 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import Message from "./Message";
-import { nanoid } from "nanoid";
+import { addMessage } from "../util/db";
+import MessageList from "./MessageList";
+import UserInput from "./UserInput";
 
-function ChatWindow({ socket, recepient, setPage }) {
-  const [messageList, setMessageList] = useState([]);
-  const [message, setMessage] = useState("");
-  const messageBoxList = messageList?.map((obj) => (
-    <Message key={nanoid()} user={obj.user} message={obj.message} />
-  ));
-  const handleSend = () => {
-    socket.emit("message sent", message, recepient);
-    setMessageList([...messageList, { user: true, message: message }]);
-    setMessage("");
-  };
-  useEffect(() => {
-    socket.on("message received", (message, username) => {
-      if (username === recepient) {
-        setMessageList([...messageList, { user: false, message: message }]);
+function ChatWindow({ username, socket, recepient, setPage }) {
+  const [message, setMessage] = useState(null);
+  const handleSend = (message) => {
+    socket.emit("message sent", message, recepient, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        addMessage(message, username, recepient, true)
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err));
+        setMessage({ user: true, message: message });
       }
     });
-  }, [messageList, recepient, socket]);
+  };
+  useEffect(() => {
+    socket.on("message received", (message, otherUser, cb) => {
+      console.log(message + " from " + otherUser);
+      cb(message);
+      if (otherUser === recepient) {
+        addMessage(message, username, recepient, false)
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err));
+        setMessage({ user: false, message: message });
+      }
+    });
+    return () => {
+      socket.off("message received");
+    };
+  }, [recepient, socket, username]);
   return (
     <div>
       <div>
-        <button onClick={() => setPage("user list")}>Back</button>
+        <button
+          onClick={() => {
+            setPage("user list");
+          }}
+        >
+          Back
+        </button>
       </div>
       <div>{recepient}</div>
-      <div className="m-1">{messageBoxList}</div>
-      <div className="m-1">
-        <div>
-          <input
-            type="text"
-            placeholder="your text here"
-            onChange={(event) => setMessage(event.target.value)}
-            value={message}
-          />
-        </div>
-        <div className="m-4">
-          <button onClick={handleSend}>Send</button>
-        </div>
+      <div>
+        <MessageList
+          message={message}
+          recepient={recepient}
+          username={username}
+        />
+      </div>
+      <div>
+        <UserInput handleSend={handleSend} />
       </div>
     </div>
   );

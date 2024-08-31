@@ -1,15 +1,17 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserList from "./UserList";
 import { io } from "socket.io-client";
 import ChatWindow from "./ChatWindow";
 
+const socket = io("http://localhost:3000", {
+  auth: { token: localStorage.getItem("token") },
+  autoConnect: false,
+});
+
 function MainPage({ username, setTopMessage, setProcess }) {
   const [page, setPage] = useState("user list");
   const [recepient, setRecepient] = useState("");
-  const socket = io("http://localhost:3000", {
-    auth: { token: localStorage.getItem("token") },
-  });
   const handleSignOut = () => {
     localStorage.removeItem("token");
     if (socket.connected) socket.disconnect();
@@ -20,6 +22,15 @@ function MainPage({ username, setTopMessage, setProcess }) {
     setRecepient(recepient);
     setPage("chat window");
   };
+  useEffect(() => {
+    socket.connect();
+    socket.on("connect", () => {
+      console.log("socket is connected");
+    });
+    socket.on("connect_error", () => {
+      socket.connect();
+    });
+  }, []);
   if (page === "user list") {
     return (
       <div>
@@ -29,6 +40,7 @@ function MainPage({ username, setTopMessage, setProcess }) {
             username={username}
             socket={socket}
             handleChatWindow={handleChatWindow}
+            handleSignOut={handleSignOut}
           />
         </div>
         <div>
@@ -39,7 +51,12 @@ function MainPage({ username, setTopMessage, setProcess }) {
   } else {
     return (
       <div>
-        <ChatWindow socket={socket} recepient={recepient} setPage={setPage} />
+        <ChatWindow
+          username={username}
+          socket={socket}
+          recepient={recepient}
+          setPage={setPage}
+        />
       </div>
     );
   }
