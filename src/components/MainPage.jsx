@@ -5,7 +5,6 @@ import { io } from "socket.io-client";
 import ChatWindow from "./ChatWindow";
 
 const socket = io("http://localhost:3000", {
-  auth: { token: localStorage.getItem("token") },
   autoConnect: false,
 });
 
@@ -23,6 +22,7 @@ function MainPage({ username, setTopMessage, setProcess }) {
     setPage("chat window");
   };
   useEffect(() => {
+    socket.auth = { token: localStorage.getItem("token") };
     socket.connect();
     socket.on("connect", () => {
       console.log("socket is connected");

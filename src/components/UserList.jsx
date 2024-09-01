@@ -50,26 +50,30 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
     } else {
       socket.on("set online", (onlineUser, cb) => {
         console.log(onlineUser + " is set online");
-        const list = {};
-        for (const user of userList) {
-          if (user === onlineUser) list[user] = "online";
-          else list[user] = statusList[user];
-        }
-        setStatusList(list);
+        setStatusList((list) => {
+          const newList = {};
+          for (const user of userList) {
+            if (user === onlineUser) newList[user] = "online";
+            else newList[user] = list[user];
+          }
+          return newList;
+        });
         cb(username);
       });
       socket.on("set offline", (offlineUser, cb) => {
         console.log(offlineUser + " is set offline");
-        const list = {};
-        for (const user of userList) {
-          if (user === offlineUser) list[user] = "offline";
-          else list[user] = statusList[user];
-        }
-        setStatusList(list);
+        setStatusList((list) => {
+          const newList = {};
+          for (const user of userList) {
+            if (user === offlineUser) newList[user] = "offline";
+            else newList[user] = list[user];
+          }
+          return newList;
+        });
         cb(username);
       });
     }
-  }, [renderList, socket, username, userList, statusList, handleSignOut]);
+  }, [renderList, socket, username, userList, handleSignOut]);
   return (
     <div className="">
       <div>{listError}</div>
