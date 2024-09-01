@@ -73,6 +73,10 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
         cb(username);
       });
     }
+    return () => {
+      socket.off("set online");
+      socket.off("set offline");
+    };
   }, [renderList, socket, username, userList, handleSignOut]);
   return (
     <div className="">

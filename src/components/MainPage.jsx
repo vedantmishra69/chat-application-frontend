@@ -7,13 +7,48 @@ import ChatWindow from "./ChatWindow";
 const socket = io("http://localhost:3000", {
   autoConnect: false,
 });
+const connectSocket = () => {
+  if (!socket.connected) socket.connect();
+};
+const disconnectSocket = () => {
+  if (socket.connected) socket.disconnect();
+};
+
+socket.on("disconnect", (reason) => {
+  console.log(`Socket disconnected due to: ${reason}`);
+
+  if (reason === "io client disconnect") {
+    console.log("Disconnected manually by the client.");
+  } else if (reason === "io server disconnect") {
+    console.log("Disconnected by the server.");
+    setTimeout(() => {
+      connectSocket();
+    }, 5000);
+  } else {
+    console.log("Disconnected due to network issues or other errors.");
+    setTimeout(() => {
+      connectSocket();
+    }, 5000);
+  }
+});
+
+socket.on("connect", () => {
+  console.log("Connected to the server.");
+});
+
+socket.on("connect_error", (err) => {
+  console.log("Connection error:", err.message);
+  setTimeout(() => {
+    connectSocket();
+  }, 5000);
+});
 
 function MainPage({ username, setTopMessage, setProcess }) {
   const [page, setPage] = useState("user list");
   const [recepient, setRecepient] = useState("");
   const handleSignOut = () => {
     localStorage.removeItem("token");
-    if (socket.connected) socket.disconnect();
+    if (socket.connected) disconnectSocket();
     setTopMessage("");
     setProcess("sign in");
   };
@@ -24,12 +59,7 @@ function MainPage({ username, setTopMessage, setProcess }) {
   useEffect(() => {
     socket.auth = { token: localStorage.getItem("token") };
     socket.connect();
-    socket.on("connect", () => {
-      console.log("socket is connected");
-    });
-    socket.on("connect_error", () => {
-      socket.connect();
-    });
+    console.log("connection initiated");
   }, []);
   if (page === "user list") {
     return (
