@@ -1,20 +1,13 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
 
-function UserTile({ user, socket }) {
-  const [status, setStatus] = useState("offline");
-  useEffect(() => {
-    socket.emit("isOnline", user, (isOnline) => {
-      if (isOnline) setStatus("online");
-    });
-  }, [user, socket]);
+function UserTile({ user }) {
   return (
     <div className="border m-1 p-1">
       <div>
-        <span>{user}</span>
+        <span>{user.name}</span>
       </div>
       <div>
-        <span>{status}</span>
+        <span>{user.status}</span>
       </div>
     </div>
   );

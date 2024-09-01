@@ -7,18 +7,13 @@ import { nanoid } from "nanoid";
 
 function UserList({ username, socket, handleChatWindow, handleSignOut }) {
   const [userList, setUserList] = useState([]);
-  const [statusList, setStatusList] = useState({});
   const [renderList, setRenderList] = useState(false);
   const [listError, setListError] = useState("");
-  const userTileList = userList.map?.((data) => {
+  const userTileList = userList.map?.((user) => {
     return (
       <li key={nanoid()}>
-        <div onClick={() => handleChatWindow(data.username)}>
-          <UserTile
-            user={data.username}
-            status={statusList[data.username]}
-            socket={socket}
-          />
+        <div onClick={() => handleChatWindow(user.name)}>
+          <UserTile user={user} />
         </div>
       </li>
     );
@@ -34,12 +29,15 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
         })
         .then((res) => {
           console.log("list fetched: " + JSON.stringify(res.data.user_list));
+          // const list = [];
+          // for (const data of res.data.user_list) {
+          //   const user = {
+          //     name: data.username,
+          //     status: "offline",
+          //   };
+          //   list.push(user);
+          // }
           setUserList(res.data.user_list);
-          const list = {};
-          for (const username of res.data.user_list) {
-            list[username] = "offline";
-          }
-          setStatusList(list);
           setRenderList(true);
         })
         .catch((err) => {
@@ -50,11 +48,14 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
     } else {
       socket.on("set online", (onlineUser, cb) => {
         console.log(onlineUser + " is set online");
-        setStatusList((list) => {
-          const newList = {};
-          for (const user of userList) {
-            if (user === onlineUser) newList[user] = "online";
-            else newList[user] = list[user];
+        setUserList((list) => {
+          const newList = [];
+          for (const user of list) {
+            const updatedUser = {};
+            updatedUser.name = user.name;
+            updatedUser.status =
+              user.name === onlineUser ? "online" : user.status;
+            newList.push(updatedUser);
           }
           return newList;
         });
@@ -62,11 +63,14 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
       });
       socket.on("set offline", (offlineUser, cb) => {
         console.log(offlineUser + " is set offline");
-        setStatusList((list) => {
-          const newList = {};
-          for (const user of userList) {
-            if (user === offlineUser) newList[user] = "offline";
-            else newList[user] = list[user];
+        setUserList((list) => {
+          const newList = [];
+          for (const user of list) {
+            const updatedUser = {};
+            updatedUser.name = user.name;
+            updatedUser.status =
+              user.name === offlineUser ? "offline" : user.status;
+            newList.push(updatedUser);
           }
           return newList;
         });
