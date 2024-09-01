@@ -4,7 +4,8 @@ import { addMessage } from "../util/db";
 import MessageList from "./MessageList";
 import UserInput from "./UserInput";
 
-function ChatWindow({ username, socket, recepient, setPage }) {
+function ChatWindow({ username, socket, recepient, setPage, recepientStatus }) {
+  const [status, setStatus] = useState(recepientStatus);
   const [message, setMessage] = useState(null);
   const handleSend = (message) => {
     socket.emit("message sent", message, recepient, (err) => {
@@ -29,8 +30,20 @@ function ChatWindow({ username, socket, recepient, setPage }) {
         setMessage({ user: false, message: message });
       }
     });
+    socket.on("set online", (onlineUser, cb) => {
+      console.log(onlineUser + " is set online");
+      if (onlineUser === recepient) setStatus("online");
+      cb(username);
+    });
+    socket.on("set offline", (offlineUser, cb) => {
+      console.log(offlineUser + " is set offline");
+      if (offlineUser === recepient) setStatus("offline");
+      cb(username);
+    });
     return () => {
       socket.off("message received");
+      socket.off("set online");
+      socket.off("set offline");
     };
   }, [recepient, socket, username]);
   return (
@@ -45,6 +58,7 @@ function ChatWindow({ username, socket, recepient, setPage }) {
         </button>
       </div>
       <div>{recepient}</div>
+      <div>{status}</div>
       <div>
         <MessageList
           message={message}

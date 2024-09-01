@@ -46,14 +46,16 @@ socket.on("connect_error", (err) => {
 function MainPage({ username, setTopMessage, setProcess }) {
   const [page, setPage] = useState("user list");
   const [recepient, setRecepient] = useState("");
+  const [recepientStatus, setRecepientStatus] = useState("");
   const handleSignOut = () => {
     localStorage.removeItem("token");
     if (socket.connected) disconnectSocket();
     setTopMessage("");
     setProcess("sign in");
   };
-  const handleChatWindow = (recepient) => {
+  const handleChatWindow = (recepient, status) => {
     setRecepient(recepient);
+    setRecepientStatus(status);
     setPage("chat window");
   };
   useEffect(() => {
@@ -83,6 +85,7 @@ function MainPage({ username, setTopMessage, setProcess }) {
       <div>
         <ChatWindow
           username={username}
+          recepientStatus={recepientStatus}
           socket={socket}
           recepient={recepient}
           setPage={setPage}

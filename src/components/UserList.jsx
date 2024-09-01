@@ -12,7 +12,7 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
   const userTileList = userList.map?.((user) => {
     return (
       <li key={nanoid()}>
-        <div onClick={() => handleChatWindow(user.name)}>
+        <div onClick={() => handleChatWindow(user.name, user.status)}>
           <UserTile user={user} />
         </div>
       </li>
@@ -29,14 +29,6 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
         })
         .then((res) => {
           console.log("list fetched: " + JSON.stringify(res.data.user_list));
-          // const list = [];
-          // for (const data of res.data.user_list) {
-          //   const user = {
-          //     name: data.username,
-          //     status: "offline",
-          //   };
-          //   list.push(user);
-          // }
           setUserList(res.data.user_list);
           setRenderList(true);
         })
