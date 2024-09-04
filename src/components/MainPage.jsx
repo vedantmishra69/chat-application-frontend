@@ -1,8 +1,11 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import UserList from "./UserList";
 import { io } from "socket.io-client";
 import ChatWindow from "./ChatWindow";
+import axios from "axios";
+import { SERVER_URL } from "../util/constants";
+import { addMessage } from "../util/db";
 
 const socket = io("http://localhost:3000", {
   autoConnect: false,
@@ -58,11 +61,55 @@ function MainPage({ username, setTopMessage, setProcess }) {
     setRecepientStatus(status);
     setPage("chat window");
   };
+  const getOffset = useCallback(() => {
+    const offset = localStorage.getItem(`${username}-offset`);
+    if (offset) return offset;
+    localStorage.setItem(`${username}-offset`, 0);
+    return 0;
+  }, [username]);
   useEffect(() => {
-    socket.auth = { token: localStorage.getItem("token") };
+    socket.auth = {
+      token: localStorage.getItem("token"),
+      offset: getOffset(),
+    };
     socket.connect();
     console.log("connection initiated");
-  }, []);
+  }, [getOffset, username]);
+  useEffect(() => {
+    if (page === "user list") setRecepient("");
+  }, [page]);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    console.log("requesting from offset " + getOffset());
+    axios
+      .get(SERVER_URL + "/db/messages", {
+        headers: {
+          Authorization: token,
+        },
+        params: {
+          offset: getOffset(),
+        },
+      })
+      .then((res) => {
+        console.log("unread messages");
+        console.log(res.data.messages);
+        for (const message of res.data.messages) {
+          const _username =
+            message.receiver === username ? message.receiver : message.sender;
+          const _recepient =
+            message.receiver === username ? message.sender : message.receiver;
+          const type = message.receiver === username ? false : true;
+          addMessage(message.content, _username, _recepient, type)
+            .then((res) => {
+              socket.auth.offset = message.offset;
+              localStorage.setItem(`${username}-offset`, message.offset);
+              console.log(res);
+            })
+            .catch((err) => console.log(err));
+        }
+      })
+      .catch((err) => console.log(err));
+  }, [getOffset, username]);
   if (page === "user list") {
     return (
       <div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { SERVER_URL } from "../util/constants";
 import { nanoid } from "nanoid";
+import { addMessage } from "../util/db";
 
 function UserList({ username, socket, handleChatWindow, handleSignOut }) {
   const [userList, setUserList] = useState([]);
@@ -74,6 +75,27 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
       socket.off("set offline");
     };
   }, [renderList, socket, username, userList, handleSignOut]);
+  useEffect(() => {
+    socket.on("message received", (message, cb) => {
+      console.log(
+        message.content + " from " + message.sender + " to " + message.receiver,
+      );
+      cb(message);
+      const _username =
+        message.receiver === username ? message.receiver : message.sender;
+      const recepient =
+        message.receiver === username ? message.sender : message.receiver;
+      const type = message.receiver === username ? false : true;
+      addMessage(message.content, _username, recepient, type)
+        .then((res) => {
+          socket.auth.offset = message.offset;
+          localStorage.setItem(`${username}-offset`, message.offset);
+          console.log(res);
+        })
+        .catch((err) => console.log(err));
+    });
+    return () => socket.off("message received");
+  }, [socket, username]);
   return (
     <div className="">
       <div>{listError}</div>
