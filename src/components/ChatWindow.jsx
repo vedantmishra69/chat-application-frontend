@@ -13,7 +13,6 @@ function ChatWindow({ username, socket, recepient, setPage, recepientStatus }) {
         .then((res) => console.log(res))
         .catch((err) => console.log(err));
       setMessage({ user: true, message: message });
-      socket.auth.offset = offset;
       localStorage.setItem(`${username}-offset`, offset);
     });
   };
@@ -24,7 +23,6 @@ function ChatWindow({ username, socket, recepient, setPage, recepientStatus }) {
       addMessage(message.content, message.receiver, message.sender, false)
         .then((res) => {
           console.log(res);
-          socket.auth.offset = message.offset;
           localStorage.setItem(`${username}-offset`, message.offset);
         })
         .catch((err) => console.log(err));

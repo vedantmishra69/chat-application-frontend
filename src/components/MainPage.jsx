@@ -70,11 +70,10 @@ function MainPage({ username, setTopMessage, setProcess }) {
   useEffect(() => {
     socket.auth = {
       token: localStorage.getItem("token"),
-      offset: getOffset(),
     };
     socket.connect();
     console.log("connection initiated");
-  }, [getOffset, username]);
+  }, [username]);
   useEffect(() => {
     if (page === "user list") setRecepient("");
   }, [page]);
@@ -101,7 +100,6 @@ function MainPage({ username, setTopMessage, setProcess }) {
           const type = message.receiver === username ? false : true;
           addMessage(message.content, _username, _recepient, type)
             .then((res) => {
-              socket.auth.offset = message.offset;
               localStorage.setItem(`${username}-offset`, message.offset);
               console.log(res);
             })

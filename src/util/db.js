@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 let db;
 const dbName = "MessagesDatabase";
-const dbVersion = 10;
+const dbVersion = 12;
 
 const request = indexedDB.open(dbName, dbVersion);
 
@@ -45,7 +45,7 @@ request.onupgradeneeded = (event) => {
     };
   }
 
-  if (oldVersion < 10) {
+  if (oldVersion < 12) {
     const objectStore = event.target.transaction.objectStore("messages")
     objectStore.clear()
   }
