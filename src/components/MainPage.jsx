@@ -108,20 +108,30 @@ function MainPage({ username, setTopMessage, setProcess }) {
       })
       .catch((err) => console.log(err));
   }, [getOffset, username]);
+
   if (page === "user list") {
     return (
-      <div>
-        <p>{"Welcome " + username}</p>
-        <div>
-          <UserList
-            username={username}
-            socket={socket}
-            handleChatWindow={handleChatWindow}
-            handleSignOut={handleSignOut}
-          />
-        </div>
-        <div>
-          <button onClick={handleSignOut}>Sign Out</button>
+      <div className="min-h-screen flex w-full justify-center items-center bg-gray-50">
+        <div className="w-full max-w-md space-y-4 rounded-lg shadow-md py-4 px-4 bg-white">
+          <div className="w-full flex justify-center">
+            <p className="w-max text-xl poppins-medium">
+              {"Welcome " + username}
+            </p>
+          </div>
+          <div>
+            <UserList
+              username={username}
+              socket={socket}
+              handleChatWindow={handleChatWindow}
+              handleSignOut={handleSignOut}
+            />
+          </div>
+          <button
+            onClick={handleSignOut}
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Sign Out
+          </button>
         </div>
       </div>
     );

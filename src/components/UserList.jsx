@@ -10,15 +10,17 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
   const [userList, setUserList] = useState([]);
   const [renderList, setRenderList] = useState(false);
   const [listError, setListError] = useState("");
-  const userTileList = userList.map?.((user) => {
-    return (
-      <li key={nanoid()}>
-        <div onClick={() => handleChatWindow(user.name, user.status)}>
-          <UserTile user={user} />
-        </div>
-      </li>
-    );
-  });
+
+  const userTileList = userList.map?.((user) => (
+    <li key={nanoid()}>
+      <div
+        onClick={() => handleChatWindow(user.name, user.status)}
+        className="cursor-pointer hover:bg-gray-50 transition-colors duration-150 rounded-lg"
+      >
+        <UserTile user={user} />
+      </div>
+    </li>
+  ));
   useEffect(() => {
     if (!renderList) {
       const token = localStorage.getItem("token");
@@ -97,10 +99,16 @@ function UserList({ username, socket, handleChatWindow, handleSignOut }) {
     return () => socket.off("message received");
   }, [socket, username]);
   return (
-    <div className="">
-      <div>{listError}</div>
-      <div>
-        <ul>{userTileList}</ul>
+    <div className="w-full max-w-md bg-white rounded-lg overflow-hidden">
+      {listError && (
+        <div className="px-4 py-2 bg-red-50 text-red-600 text-sm">
+          {listError}
+        </div>
+      )}
+      <div className="divide-y divide-gray-200">
+        <ul className="overflow-y-auto max-h-[calc(100vh-20rem)]">
+          {userTileList}
+        </ul>
       </div>
     </div>
   );

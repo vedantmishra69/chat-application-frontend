@@ -85,56 +85,87 @@ function SignUp({ topMessage, setTopMessage, setProcess }) {
   }
 
   return (
-    <div>
-      <div>{message}</div>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Username</label>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+        {message && (
+          <div className="text-center text-red-600 font-medium">{message}</div>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <label
+              htmlFor="username"
+              className="block text-sm poppins-medium text-gray-700"
+            >
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={username}
+              onChange={handleUsernameInput}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {usernameError && (
+              <div className="text-sm text-red-600">{usernameError}</div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="password"
+              className="block text-sm poppins-medium text-gray-700"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={password}
+              onChange={handlePasswordInput}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {passwordError && (
+              <div className="text-sm text-red-600">{passwordError}</div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="confirm_password"
+              className="block text-sm poppins-medium text-gray-700"
+            >
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              name="confirm_password"
+              value={confirmPassword}
+              onChange={handleConfirmPasswordInput}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {confirmPasswordError && (
+              <div className="text-sm text-red-600">{confirmPasswordError}</div>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Sign Up
+          </button>
+        </form>
+
+        <div
+          onClick={() => {
+            setTopMessage("");
+            setProcess("sign in");
+          }}
+          className="text-center poppins-medium text-sm text-blue-600 hover:text-blue-700 cursor-pointer"
+        >
+          Already have an account?
         </div>
-        <div>
-          <input
-            type="text"
-            name="username"
-            value={username}
-            onChange={handleUsernameInput}
-          />
-        </div>
-        <div>{usernameError}</div>
-        <div>
-          <label htmlFor="password">Password</label>
-        </div>
-        <div>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={handlePasswordInput}
-          />
-        </div>
-        <div>{passwordError}</div>
-        <div>
-          <label htmlFor="confirm_password">Confirm password</label>
-        </div>
-        <div>
-          <input
-            type="password"
-            name="confirm_password"
-            value={confirmPassword}
-            onChange={handleConfirmPasswordInput}
-          />
-        </div>
-        <div>{confirmPasswordError}</div>
-        <div>
-          <button type="submit">Sign Up</button>
-        </div>
-      </form>
-      <div
-        onClick={() => {
-          setTopMessage("");
-          setProcess("sign in");
-        }}
-      >
-        Already have an account?
       </div>
     </div>
   );
