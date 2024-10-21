@@ -7,7 +7,7 @@ import axios from "axios";
 import { SERVER_URL } from "../util/constants";
 import { addMessage } from "../util/db";
 
-const socket = io("http://localhost:3000", {
+const socket = io(SERVER_URL, {
   autoConnect: false,
 });
 const connectSocket = () => {
